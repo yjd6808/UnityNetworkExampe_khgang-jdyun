@@ -35,7 +35,7 @@ public class Network
     public void Start()
     {
         _Running = true;
-        Client.Connect(IPAddress.Parse( NetworkConstant.ServerIP), NetworkConstant.ServerPort);
+        Client.BeginConnect(IPAddress.Parse( NetworkConstant.ServerIP), NetworkConstant.ServerPort);
     }
 
     public void Stop()

@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class UnityPacketDispatcher : MonoBehaviour
 {
     private static UnityPacketDispatcher Dispatcher;

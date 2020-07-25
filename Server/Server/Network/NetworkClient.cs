@@ -15,7 +15,6 @@ public class NetworkClient
 {
     public long ID { get; set; }
     public TcpClient TcpClient { get; set; }
-    public bool Connected { get; private set; }
 
     private Thread _PacketReceiveThread;
     private NetworkStream _Stream;
@@ -29,7 +28,6 @@ public class NetworkClient
     public NetworkClient(TcpClient tcpClient)
     {
         TcpClient = tcpClient;
-        Connected = true;
 
         _Stream = TcpClient.GetStream();
         _PacketReceiveThread = new Thread(OnReceivePacket);
@@ -42,10 +40,9 @@ public class NetworkClient
 
     public void Disconnect()
     {
-        Connected = false;
         if (TcpClient.Connected)
             TcpClient.Close();
-        Console.WriteLine(ID + " 유저가 접속을 종료했습니다");
+        Console.WriteLine(ID + " 유저가 접속을 종료했습니다.");
     }
     
     public void Send(INetworkPacket networkPacket)
@@ -56,15 +53,16 @@ public class NetworkClient
 
     private void OnReceivePacket()
     {
-        while (Connected)
+        while (TcpClient.Connected)
         {
             int readBytesCount = 0;
             try
             {
                 readBytesCount = _Stream.Read(_ReciveBytes, 0, _ReciveBytes.Length);
             }
-            catch
+            catch 
             {
+                //이 쓰레드는 Read 상태에서 대기중이기 때문에 대기중에 연결중인 클라와 접속이 끊어지면 익셉션 토해냄
                 NetworkServer.Get().Disconnect(this);
             }
 
@@ -75,6 +73,7 @@ public class NetworkClient
             }
             else
             {
+                //0바이트 도착하면 나가도록...
                 break;
             }
         }

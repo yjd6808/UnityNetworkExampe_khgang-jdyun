@@ -13,6 +13,6 @@ public class SendButton : MonoBehaviour
     public void OnClick()
     {
         NetworkClient client = NetworkClient.Get();
-        client.Send(new PtkChatMessage(client.GetID(), NickNameField.text, MessageField.text));
+        client.Send(new PtkChatMessage(client.ID, NickNameField.text, MessageField.text));
     }
 }

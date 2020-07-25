@@ -7,6 +7,6 @@ public class UnityApplication : MonoBehaviour
 {
     private void OnApplicationQuit()
     {
-        NetworkClient.Get().Send(new PtkClientDisconnect(NetworkClient.Get().GetID()));
+        NetworkClient.Get().Send(new PtkClientDisconnect(NetworkClient.Get().ID));
     }
 }

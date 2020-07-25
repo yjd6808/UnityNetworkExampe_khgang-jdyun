@@ -10,13 +10,14 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class NetworkClient
 {
+    public long ID { get; private set; }
+
     private TcpClient _TcpClient;                          //서버와 연결된 소켓 클라이언트
-    private long _ID;                                      //클라이언트 고유 식별 번호
 
     private const ushort MaxReceiveByteCount = 4092;                //최대 수신 가능한 바이트
     private const ushort MaxSendByteCount = 4092;                   //최대 송신 가능한 바이트
@@ -30,7 +31,6 @@ public class NetworkClient
     private readonly NetworkPacketStreamer _SendPacketStreamer;     //송신 패킷을 간접적으로 처리하는 클래스
     private readonly NetworkPacketStreamer _RecivePacketStreamer;   //수신 패킷을 간접적으로 처리하는 클래스
 
-    private bool Connected;
     private NetworkStream _Stream;
 
     public NetworkClient()
@@ -42,24 +42,22 @@ public class NetworkClient
     }
 
     public static NetworkClient Get() => Network.Get().Client;
-    public long GetID() => _ID;
-
-    public void Connect(IPAddress ipAddress, ushort port)
+    public void BeginConnect(IPAddress ipAddress, ushort port)
     {
+        //이미 연결된 경우는 바로 반환
+        if (_TcpClient != null && _TcpClient.Connected)
+        {
+            Debug.LogError("이미 서버와 연결되어 있습니다.");
+            return;
+        }
+
         try
         {
-            Connected = true;
+            ID = DateTime.Now.Ticks;
 
-            _ID = DateTime.Now.Ticks;
             _TcpClient = new TcpClient();
-            _TcpClient.Connect(ipAddress, (int)port);
-            _Stream = _TcpClient.GetStream();
-            _ReceiveThread = new Thread(ReceiveThreadFunction) { IsBackground = true };
-            _SendThread = new Thread(SendThreadFunction) { IsBackground = true };
-            _ReceiveThread.Start();
-            _SendThread.Start();
-            Send(new PtkClientConnect(_ID));
-            Debug.Log("서버 접속 성공!");
+            _TcpClient.BeginConnect(ipAddress, (int)port, new AsyncCallback(ConnectCallback), _TcpClient);
+            Debug.Log("서버에 접속을 시도합니다");
         }
         catch (Exception e)
         {
@@ -67,14 +65,34 @@ public class NetworkClient
         }
     }
 
+    private void ConnectCallback(IAsyncResult result)
+    {
+        if (_TcpClient.Connected)
+        {
+            _Stream = _TcpClient.GetStream();
+            _ReceiveThread = new Thread(ReceiveThreadFunction) { IsBackground = true };
+            _SendThread = new Thread(SendThreadFunction) { IsBackground = true };
+            _ReceiveThread.Start();
+            _SendThread.Start();
+            Send(new PtkClientConnect(ID));
+            Debug.Log("서버 접속에 성공하였습니다.");
+        }
+        else
+        {
+            Debug.Log("서버 접속에 실패하였습니다.");
+        }
+    }
+
     public void Disconnect()
     {
         try
         {
-            Connected = false;
+            //연결중이라면 해제한다.
             if (_TcpClient.Connected)
+            {
                 _TcpClient.Client.Disconnect(true);
-            Debug.Log("서버 접속 해제 성공!");
+                Debug.Log("서버 접속 해제 성공!");
+            }
         }
         catch( Exception e)
         {
@@ -85,12 +103,11 @@ public class NetworkClient
     public void Send(INetworkPacket packet)
     {
         _SendPacketStreamer.RegisterPacket(packet);
-        Debug.Log(packet.GetType() + " 패킷 전송완료");
     }
 
     private void ReceiveThreadFunction()
     {
-        while (Connected)
+        while (_TcpClient.Connected)
         {
             int readBytesCount = 0;
             try
@@ -99,7 +116,7 @@ public class NetworkClient
             }
             catch 
             {
-                //갑자기 서버 닫힌 경우
+                Debug.LogError("서버와 연결이 강제적으로 끊어졌당께!");
                 break;
             }
 
@@ -120,14 +137,19 @@ public class NetworkClient
 
     private void SendThreadFunction()
     {
-        while (Connected)
+        while (_TcpClient.Connected)
             _SendPacketStreamer.FlushPacket();
     }
 
     private void SendPacket(INetworkPacket packet)
     {
+        //연결되어 있지 않다면 안보냄
+        if (!_TcpClient.Connected)
+            return;
+
         _SendBytes = packet.ToByteArray();
         _Stream.Write(_SendBytes, 0, _SendBytes.Length);
+        Debug.Log(packet.GetType() + " 패킷 전송완료");
     }
 
     private void ReceivePacket(INetworkPacket packet)
