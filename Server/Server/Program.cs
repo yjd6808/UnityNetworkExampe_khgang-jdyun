@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -10,6 +6,11 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            NetworkServer.Get().Start();
+            do
+            {
+                Console.WriteLine("아무키나 입력시 종료됨.");
+            } while (Console.ReadLine().Length >= 0);
         }
     }
 }

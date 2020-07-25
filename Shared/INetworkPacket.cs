@@ -6,7 +6,10 @@
 // ===============================
 
 
-public interface INetworkPacket
+namespace NetworkShared
 {
-    public long ID { get; set; }
+    public interface INetworkPacket
+    {
+        long ID { get; set; }
+    }
 }

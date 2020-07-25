@@ -11,14 +11,16 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
+using NetworkShared;
 
 public class NetworkPacketStreamer
 {
-    private ConcurrentQueue<INetworkPacket> _PackerProcesser;       //쓰레드에 안전한 패킷 큐
-    private Action<INetworkPacket> _PacketProccessAction;           //해당 패킷에 대한 처리 함수
+    private readonly ConcurrentQueue<INetworkPacket> _PackerProcesser;       //쓰레드에 안전한 패킷 큐
+    private readonly Action<INetworkPacket> _PacketProccessAction;           //해당 패킷에 대한 처리 함수
 
     public NetworkPacketStreamer(Action<INetworkPacket> processAction)
     {
+        _PackerProcesser = new ConcurrentQueue<INetworkPacket>();
         _PacketProccessAction = processAction;
     }
 
@@ -27,7 +29,7 @@ public class NetworkPacketStreamer
         _PackerProcesser.Enqueue(packet);
     }
 
-    public void FlushPacket(INetworkPacket packet)
+    public void FlushPacket()
     {
         while (_PackerProcesser.IsEmpty == false)
         {

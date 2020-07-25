@@ -1,0 +1,9 @@
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\bin\Debug\Server.exe.config
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\bin\Debug\Server.exe
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\bin\Debug\Server.pdb
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\bin\Debug\Shared.dll
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\bin\Debug\Shared.pdb
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\obj\Debug\Server.csprojAssemblyReference.cache
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\obj\Debug\Server.csproj.CopyComplete
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\obj\Debug\Server.exe
+D:\Programming\MyProject\_DevUnity\UnityNetworkExample_khgang&Jdyun\Server\Server\obj\Debug\Server.pdb

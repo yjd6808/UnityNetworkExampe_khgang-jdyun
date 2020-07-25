@@ -7,6 +7,6 @@
 
 public class NetworkConstant
 {
-    public static string ServerIP   = "221.162.129.150";
+    public static string ServerIP   = "127.0.0.1";
     public static ushort ServerPort = 12345;
 }
